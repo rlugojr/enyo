@@ -407,7 +407,7 @@ module.exports = kind(
 
 		var lastIndex = this.getPanels().length - 1,
 			nextPanel = this.createPanel(info, moreInfo),
-			newIndex = lastIndex + 1;
+			targetIndex = (opts && opts.targetIndex != null) ? opts.targetIndex : lastIndex + 1;
 		if (this.cacheViews) {
 			this.pruneQueue([info]);
 		}
@@ -418,8 +418,8 @@ module.exports = kind(
 			nextPanel.postTransition();
 		}
 
-		if (!this.animate || (opts && opts.direct)) this.set('index', newIndex, {force: opts && opts.force});
-		else this.animateTo(newIndex);
+		if (!this.animate || (opts && opts.direct)) this.set('index', targetIndex, {force: opts && opts.force});
+		else this.animateTo(targetIndex);
 
 		// TODO: When pushing panels after we have gone back (but have not popped), we need to
 		// adjust the position of the panels after the previous index before our push.
@@ -534,7 +534,7 @@ module.exports = kind(
 	* @public
 	*/
 	replaceAt: function (start, count, info) {
-		var panels, insertBefore, commonInfo, end, idx;
+		var panels, insertBefore, commonInfo, end, idx, opts;
 
 		if (this.transitioning) return;
 
@@ -544,6 +544,7 @@ module.exports = kind(
 		end = start + count;
 		insertBefore = panels[end];
 		commonInfo = {addBefore: insertBefore};
+		opts = {direct: true, force: true, targetIndex: start};
 
 		// remove existing panels
 		for (idx = end - 1; idx >= start; idx--) {
@@ -551,8 +552,8 @@ module.exports = kind(
 		}
 
 		// add replacement panels
-		if (utils.isArray(info)) return this.pushPanels(info, commonInfo, {direct: true, force: true});
-		else return this.pushPanel(info, commonInfo, {direct: true, force: true});
+		if (utils.isArray(info)) return this.pushPanels(info, commonInfo, opts);
+		else return this.pushPanel(info, commonInfo, opts);
 	},
 
 
